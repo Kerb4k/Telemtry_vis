@@ -1,5 +1,7 @@
 #include <pybind11/pybind11.h>
 #include <cstdint>
+#include <iostream>
+
 
 uint64_t merge(uint64_t a, uint64_t b) {
     uint64_t result = a;
@@ -8,17 +10,20 @@ uint64_t merge(uint64_t a, uint64_t b) {
     return result;
 }
 
-float signal_message(uint64_t message, int start, int length, float factor) {
-    //takes all bits from start for a length of a message and multiplies by factor
+float signal_message(uint64_t message, int start, int length, int message_len, float factor) {    
+    start = 64 - message_len * 8 + start;
+    message = message >> (64 - start + length);
+  
     uint64_t mask = 0;
     for (int i = 0; i < length; i++) {
-        mask <<= 1;
-        mask |= 1;
+         mask <<= 1;  // shift the mask left by one bit
+        mask |= 1;   // set the least significant bit to 1
     }
-    mask <<= start;
+  
     uint64_t masked_message = message & mask;
-    masked_message >>= start;
+
     return masked_message * factor;
+
 }
 
 
